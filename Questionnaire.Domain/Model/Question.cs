@@ -1,6 +1,6 @@
 ﻿namespace Questionnaire.Domain.Model
 {
-    internal class Question
+    public class Question
     {
         public Guid Id { get; set; }
 
@@ -8,6 +8,6 @@
 
         public string QuestionText { get; set; }
 
-        public bool IsRequared { get; set; }
+        public bool IsRequired { get; set; }
     }
 }
