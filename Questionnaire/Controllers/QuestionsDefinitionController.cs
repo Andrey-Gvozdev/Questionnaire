@@ -26,9 +26,27 @@ namespace Questionnaire.Controllers
         }
 
         [HttpPost]
-        public Task Post(QuestionDefinition newQuestionDefinition)
+        public async Task<IActionResult> Post(QuestionDefinition newQuestionDefinition)
         {
-            return questionDefinitionCRUDService.Create(newQuestionDefinition);
+            await questionDefinitionCRUDService.Create(newQuestionDefinition);
+
+            return CreatedAtAction(nameof(Get), new { id = newQuestionDefinition.Id }, newQuestionDefinition);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, QuestionDefinition updatedQuestionDefinition)
+        {
+            await questionDefinitionCRUDService.Update(id, updatedQuestionDefinition);
+
+            return Ok("Item updated");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await questionDefinitionCRUDService.Delete(id);
+
+            return Ok("Item deleted");
         }
     }
 }
