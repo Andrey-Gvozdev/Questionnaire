@@ -1,6 +1,6 @@
 ﻿namespace Questionnaire.Domain.Model
 {
-    internal class Survey
+    public class Survey
     {
         public Guid Id { get; set; }
 

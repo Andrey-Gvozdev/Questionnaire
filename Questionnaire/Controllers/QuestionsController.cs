@@ -8,9 +8,9 @@ namespace Questionnaire.Controllers
     [Route("/api/[controller]/")]
     public class QuestionsController : ControllerBase
     {
-        private readonly IQuestionCRUDService questionCRUDService;
+        private readonly IQuestionCrudService questionCRUDService;
 
-        public QuestionsController(IQuestionCRUDService questionCRUDService)
+        public QuestionsController(IQuestionCrudService questionCRUDService)
         {
             this.questionCRUDService = questionCRUDService;
         }

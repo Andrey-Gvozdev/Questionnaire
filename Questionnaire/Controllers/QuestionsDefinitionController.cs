@@ -8,9 +8,9 @@ namespace Questionnaire.Controllers
     [Route("/api/[controller]/")]
     public class QuestionsDefinitionController : ControllerBase
     {
-        private readonly IQuestionDefinitionCRUDService questionDefinitionCRUDService;
+        private readonly IQuestionDefinitionCrudService questionDefinitionCRUDService;
 
-        public QuestionsDefinitionController(IQuestionDefinitionCRUDService questionDefinitionCRUDService)
+        public QuestionsDefinitionController(IQuestionDefinitionCrudService questionDefinitionCRUDService)
         {
             this.questionDefinitionCRUDService = questionDefinitionCRUDService;
         }

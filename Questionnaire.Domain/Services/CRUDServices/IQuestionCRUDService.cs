@@ -2,7 +2,7 @@
 
 namespace Questionnaire.Domain.Services.CRUDServices
 {
-    public interface IQuestionCRUDService
+    public interface IQuestionCrudService
     {
         Task<List<Question>> Get();
 

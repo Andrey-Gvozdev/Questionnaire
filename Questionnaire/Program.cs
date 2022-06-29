@@ -11,9 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<QuestionnaireDBSettings>(builder.Configuration.GetSection("QuestionnaireDB"));
 
 builder.Services.AddTransient<IQuestionRepository, QuestionRepository>();
-builder.Services.AddTransient<IQuestionCRUDService, QuestionCRUDService>();
+builder.Services.AddTransient<IQuestionCrudService, QuestionCrudService>();
 builder.Services.AddTransient<IQuestionDefinitionRepository, QuestionDefinitionRepository>();
-builder.Services.AddTransient<IQuestionDefinitionCRUDService, QuestionDefinitionCRUDService>();
+builder.Services.AddTransient<IQuestionDefinitionCrudService, QuestionDefinitionCrudService>();
+builder.Services.AddTransient<ISurveyRepository, SurveyRepository>();
+builder.Services.AddTransient<ISurveyCrudService, SurveyCrudService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

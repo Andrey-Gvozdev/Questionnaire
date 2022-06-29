@@ -3,11 +3,11 @@ using Questionnaire.Domain.Model;
 
 namespace Questionnaire.Domain.Services.CRUDServices
 {
-    public class QuestionCRUDService : IQuestionCRUDService
+    public class QuestionCrudService : IQuestionCrudService
     {
         private readonly IQuestionRepository questionRepository;
 
-        public QuestionCRUDService(IQuestionRepository repository)
+        public QuestionCrudService(IQuestionRepository repository)
         {
             questionRepository = repository;
         }
