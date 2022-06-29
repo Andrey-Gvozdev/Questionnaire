@@ -1,7 +1,10 @@
+using Hellang.Middleware.ProblemDetails;
+using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;
 using Questionnaire.Infrastructure;
 using Questionnaire.Infrastructure.Repository;
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +16,13 @@ builder.Services.AddTransient<IQuestionDefinitionRepository, QuestionDefinitionR
 builder.Services.AddTransient<IQuestionDefinitionCRUDService, QuestionDefinitionCRUDService>();
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
+builder.Services.AddProblemDetails(options =>
+{
+    options.MapToStatusCode<NotFoundException>(StatusCodes.Status404NotFound);
+    options.MapToStatusCode<ValidationException>(StatusCodes.Status400BadRequest);
+});
 
 var app = builder.Build();
 
@@ -31,11 +37,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseProblemDetails();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();

@@ -5,7 +5,7 @@ using Questionnaire.Domain.Services.CRUDServices;
 namespace Questionnaire.Controllers
 {
     [ApiController]
-    [Route("/[controller]/")]
+    [Route("/api/[controller]/")]
     public class QuestionsDefinitionController : ControllerBase
     {
         private readonly IQuestionDefinitionCRUDService questionDefinitionCRUDService;

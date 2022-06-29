@@ -5,7 +5,7 @@ using Questionnaire.Domain.Services.CRUDServices;
 namespace Questionnaire.Controllers
 {
     [ApiController]
-    [Route("/[controller]/")]
+    [Route("/api/[controller]/")]
     public class QuestionsController : ControllerBase
     {
         private readonly IQuestionCRUDService questionCRUDService;
@@ -26,9 +26,27 @@ namespace Questionnaire.Controllers
         }
 
         [HttpPost]
-        public Task Post(Question newQuestion)
+        public async Task<IActionResult> Post(Question newQuestion)
         {
-            return questionCRUDService.Create(newQuestion);
+            await questionCRUDService.Create(newQuestion);
+
+            return CreatedAtAction(nameof(Get), new { id = newQuestion.Id }, newQuestion);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, Question updatedQuestion)
+        {
+            await questionCRUDService.Update(id, updatedQuestion);
+
+            return Ok("Item updated");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await questionCRUDService.Delete(id);
+
+            return Ok("Item deleted");
         }
     }
 }

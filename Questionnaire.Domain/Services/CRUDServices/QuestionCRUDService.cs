@@ -1,4 +1,5 @@
-﻿using Questionnaire.Domain.Model;
+﻿using Questionnaire.Domain.CustomExceptions;
+using Questionnaire.Domain.Model;
 
 namespace Questionnaire.Domain.Services.CRUDServices
 {
@@ -14,8 +15,12 @@ namespace Questionnaire.Domain.Services.CRUDServices
         public async Task<List<Question>> Get() =>
             await questionRepository.Get();
 
-        public async Task<Question> Get(Guid id) =>
-            await questionRepository.Get(id);
+        public async Task<Question> Get(Guid id)
+        {
+            var question = await questionRepository.Get(id);
+
+            return question ?? throw new NotFoundException("Item not found");
+        }
 
         public async Task Create(Question newQuestion)
         {
@@ -24,11 +29,13 @@ namespace Questionnaire.Domain.Services.CRUDServices
 
         public async Task Update(Guid id, Question updatedQuestion)
         {
+            await Get(id);
             await questionRepository.Update(id, updatedQuestion);
         }
         
         public async Task Delete(Guid id)
         {
+            await Get(id);
             await questionRepository.Delete(id);
         }
     }
