@@ -10,7 +10,7 @@
 
         public QuestionDefinitionUIType UIType { get; set; }
 
-        public object Validation { get; set; }
+        //public object Validation { get; set; }
     }
 
     public enum QuestionDefinitionType
