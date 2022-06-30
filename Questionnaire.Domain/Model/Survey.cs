@@ -1,13 +1,12 @@
-﻿namespace Questionnaire.Domain.Model
+﻿namespace Questionnaire.Domain.Model;
+
+public class Survey
 {
-    public class Survey
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public string Discription { get; set; }
+    public string Description { get; set; }
 
-        public List<Question> Questions { get; set; }
-    }
+    public List<Question> Questions { get; set; }
 }

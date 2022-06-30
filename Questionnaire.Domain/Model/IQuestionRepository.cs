@@ -1,15 +1,14 @@
-﻿namespace Questionnaire.Domain.Model
+﻿namespace Questionnaire.Domain.Model;
+
+public interface IQuestionRepository
 {
-    public interface IQuestionRepository
-    {
-        Task<List<Question>> Get();
+    Task<List<Question>> GetAllAsync();
 
-        Task<Question> Get(Guid id);
+    Task<Question> GetByIdAsync(Guid id);
 
-        Task Create(Question newQuestion);
+    Task CreateAsync(Question newQuestion);
 
-        Task Update(Guid id, Question updatedQuestion);
+    Task UpdateAsync(Guid id, Question updatedQuestion);
 
-        Task Delete(Guid id);
-    }
+    Task DeleteAsync(Guid id);
 }

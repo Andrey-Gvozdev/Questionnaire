@@ -1,42 +1,41 @@
 ﻿using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
 
-namespace Questionnaire.Domain.Services.CRUDServices
+namespace Questionnaire.Domain.Services.CRUDServices;
+
+public class QuestionCrudService : IQuestionCrudService
 {
-    public class QuestionCrudService : IQuestionCrudService
+    private readonly IQuestionRepository questionRepository;
+
+    public QuestionCrudService(IQuestionRepository repository)
     {
-        private readonly IQuestionRepository questionRepository;
+        questionRepository = repository;
+    }
+    
+    public async Task<List<Question>> GetAllAsync() =>
+        await questionRepository.GetAllAsync();
 
-        public QuestionCrudService(IQuestionRepository repository)
-        {
-            questionRepository = repository;
-        }
-        
-        public async Task<List<Question>> Get() =>
-            await questionRepository.Get();
+    public async Task<Question> GetByIdAsync(Guid id)
+    {
+        var question = await questionRepository.GetByIdAsync(id);
 
-        public async Task<Question> Get(Guid id)
-        {
-            var question = await questionRepository.Get(id);
+        return question ?? throw new NotFoundException("Item not found");
+    }
 
-            return question ?? throw new NotFoundException("Item not found");
-        }
+    public async Task CreateAsync(Question newQuestion)
+    {
+        await questionRepository.CreateAsync(newQuestion);
+    }
 
-        public async Task Create(Question newQuestion)
-        {
-            await questionRepository.Create(newQuestion);
-        }
-
-        public async Task Update(Guid id, Question updatedQuestion)
-        {
-            await Get(id);
-            await questionRepository.Update(id, updatedQuestion);
-        }
-        
-        public async Task Delete(Guid id)
-        {
-            await Get(id);
-            await questionRepository.Delete(id);
-        }
+    public async Task UpdateAsync(Guid id, Question updatedQuestion)
+    {
+        await GetByIdAsync(id);
+        await questionRepository.UpdateAsync(id, updatedQuestion);
+    }
+    
+    public async Task DeleteAsync(Guid id)
+    {
+        await GetByIdAsync(id);
+        await questionRepository.DeleteAsync(id);
     }
 }

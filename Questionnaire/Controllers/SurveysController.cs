@@ -2,51 +2,50 @@
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;
 
-namespace Questionnaire.Controllers
+namespace Questionnaire.Controllers;
+
+[ApiController]
+[Route("/api/[controller]/")]
+public class SurveysController : ControllerBase
 {
-    [ApiController]
-    [Route("/api/[controller]/")]
-    public class SurveysController : ControllerBase
+    private readonly ISurveyCrudService surveyCrudService;
+
+    public SurveysController(ISurveyCrudService surveyCrudService)
     {
-        private readonly ISurveyCrudService surveyCrudService;
+        this.surveyCrudService = surveyCrudService;
+    }
 
-        public SurveysController(ISurveyCrudService surveyCrudService)
-        {
-            this.surveyCrudService = surveyCrudService;
-        }
+    [HttpGet]
+    public async Task<List<Survey>> GetAllAsync() =>
+        await surveyCrudService.GetAllAsync();
 
-        [HttpGet]
-        public async Task<List<Survey>> Get() =>
-            await surveyCrudService.Get();
+    [HttpGet("{id}")]
+    public Task<Survey> GetByIdAsync(Guid id)
+    {
+        return surveyCrudService.GetByIdAsync(id);
+    }
 
-        [HttpGet("{id}")]
-        public Task<Survey> Get(Guid id)
-        {
-            return surveyCrudService.Get(id);
-        }
+    [HttpPost]
+    public async Task<IActionResult> PostAsync(Survey newSurvey)
+    {
+        await surveyCrudService.CreateAsync(newSurvey);
 
-        [HttpPost]
-        public async Task<IActionResult> Post(Survey newSurvey)
-        {
-            await surveyCrudService.Create(newSurvey);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = newSurvey.Id }, newSurvey);
+    }
 
-            return CreatedAtAction(nameof(Get), new { id = newSurvey.Id }, newSurvey);
-        }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutAsync(Guid id, Survey updatedSurvey)
+    {
+        await surveyCrudService.UpdateAsync(id, updatedSurvey);
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(Guid id, Survey updatedSurvey)
-        {
-            await surveyCrudService.Update(id, updatedSurvey);
+        return Ok("Item updated");
+    }
 
-            return Ok("Item updated");
-        }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(Guid id)
+    {
+        await surveyCrudService.DeleteAsync(id);
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            await surveyCrudService.Delete(id);
-
-            return Ok("Item deleted");
-        }
+        return Ok("Item deleted");
     }
 }
