@@ -1,5 +1,7 @@
-﻿using Questionnaire.Domain.CustomExceptions;
+﻿using MongoDB.Driver;
+using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
 
@@ -24,7 +26,10 @@ public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
 
     public async Task CreateAsync(QuestionDefinition newQuestionDefinition)
     {
-        await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
+        if (await questionDefinitionRepository.GetByIdAsync(newQuestionDefinition.Id) != null)
+            throw new ValidationException(String.Concat("Item vith id: ", newQuestionDefinition.Id, " already exists"));
+        else
+            await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
     }
 
     public async Task UpdateAsync(Guid id, QuestionDefinition updatedQuestionDefinition)

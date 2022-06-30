@@ -1,5 +1,6 @@
 ﻿using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
 
@@ -24,7 +25,10 @@ public class SurveyCrudService : ISurveyCrudService
 
     public async Task CreateAsync(Survey newSurvey)
     {
-        await surveyRepository.CreateAsync(newSurvey);
+        if (await surveyRepository.GetByIdAsync(newSurvey.Id) != null)
+            throw new ValidationException(String.Concat("Item vith id: ", newSurvey.Id ," already exists"));
+        else
+            await surveyRepository.CreateAsync(newSurvey);
     }
 
     public async Task UpdateAsync(Guid id, Survey updatedSurvey)
