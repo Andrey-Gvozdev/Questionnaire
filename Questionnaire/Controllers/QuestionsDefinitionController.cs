@@ -2,51 +2,50 @@
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;
 
-namespace Questionnaire.Controllers
+namespace Questionnaire.Controllers;
+
+[ApiController]
+[Route("/api/[controller]/")]
+public class QuestionsDefinitionController : ControllerBase
 {
-    [ApiController]
-    [Route("/api/[controller]/")]
-    public class QuestionsDefinitionController : ControllerBase
+    private readonly IQuestionDefinitionCrudService questionDefinitionCRUDService;
+
+    public QuestionsDefinitionController(IQuestionDefinitionCrudService questionDefinitionCRUDService)
     {
-        private readonly IQuestionDefinitionCrudService questionDefinitionCRUDService;
+        this.questionDefinitionCRUDService = questionDefinitionCRUDService;
+    }
 
-        public QuestionsDefinitionController(IQuestionDefinitionCrudService questionDefinitionCRUDService)
-        {
-            this.questionDefinitionCRUDService = questionDefinitionCRUDService;
-        }
+    [HttpGet]
+    public async Task<List<QuestionDefinition>> GetAllAsync() =>
+        await questionDefinitionCRUDService.GetAllAsync();
 
-        [HttpGet]
-        public async Task<List<QuestionDefinition>> Get() =>
-            await questionDefinitionCRUDService.Get();
+    [HttpGet("{id}")]
+    public Task<QuestionDefinition> GetByIdAsync(Guid id)
+    {
+        return questionDefinitionCRUDService.GetByIdAsync(id);
+    }
 
-        [HttpGet("{id}")]
-        public Task<QuestionDefinition> Get(Guid id)
-        {
-            return questionDefinitionCRUDService.Get(id);
-        }
+    [HttpPost]
+    public async Task<IActionResult> PostAsync(QuestionDefinition newQuestionDefinition)
+    {
+        await questionDefinitionCRUDService.CreateAsync(newQuestionDefinition);
 
-        [HttpPost]
-        public async Task<IActionResult> Post(QuestionDefinition newQuestionDefinition)
-        {
-            await questionDefinitionCRUDService.Create(newQuestionDefinition);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = newQuestionDefinition.Id }, newQuestionDefinition);
+    }
 
-            return CreatedAtAction(nameof(Get), new { id = newQuestionDefinition.Id }, newQuestionDefinition);
-        }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutAsync(Guid id, QuestionDefinition updatedQuestionDefinition)
+    {
+        await questionDefinitionCRUDService.UpdateAsync(id, updatedQuestionDefinition);
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(Guid id, QuestionDefinition updatedQuestionDefinition)
-        {
-            await questionDefinitionCRUDService.Update(id, updatedQuestionDefinition);
+        return Ok("Item updated");
+    }
 
-            return Ok("Item updated");
-        }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(Guid id)
+    {
+        await questionDefinitionCRUDService.DeleteAsync(id);
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            await questionDefinitionCRUDService.Delete(id);
-
-            return Ok("Item deleted");
-        }
+        return Ok("Item deleted");
     }
 }

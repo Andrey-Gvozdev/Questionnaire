@@ -1,42 +1,45 @@
 ﻿using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
+using System.ComponentModel.DataAnnotations;
 
-namespace Questionnaire.Domain.Services.CRUDServices
+namespace Questionnaire.Domain.Services.CRUDServices;
+
+public class SurveyCrudService : ISurveyCrudService
 {
-    public class SurveyCrudService : ISurveyCrudService
+    private readonly ISurveyRepository surveyRepository;
+
+    public SurveyCrudService(ISurveyRepository repository)
     {
-        private readonly ISurveyRepository surveyRepository;
+        surveyRepository = repository;
+    }
 
-        public SurveyCrudService(ISurveyRepository repository)
-        {
-            surveyRepository = repository;
-        }
+    public async Task<List<Survey>> GetAllAsync() =>
+        await surveyRepository.GetAllAsync();
 
-        public async Task<List<Survey>> Get() =>
-            await surveyRepository.Get();
+    public async Task<Survey> GetByIdAsync(Guid id)
+    {
+        var survey = await surveyRepository.GetByIdAsync(id);
 
-        public async Task<Survey> Get(Guid id)
-        {
-            var survey = await surveyRepository.Get(id);
+        return survey ?? throw new NotFoundException("Item not found");
+    }
 
-            return survey ?? throw new NotFoundException("Item not found");
-        }
+    public async Task CreateAsync(Survey newSurvey)
+    {
+        if (await surveyRepository.GetByIdAsync(newSurvey.Id) != null)
+            throw new ValidationException(String.Concat("Item vith id: ", newSurvey.Id ," already exists"));
+        else
+            await surveyRepository.CreateAsync(newSurvey);
+    }
 
-        public async Task Create(Survey newSurvey)
-        {
-            await surveyRepository.Create(newSurvey);
-        }
+    public async Task UpdateAsync(Guid id, Survey updatedSurvey)
+    {
+        await GetByIdAsync(id);
+        await surveyRepository.UpdateAsync(id, updatedSurvey);
+    }
 
-        public async Task Update(Guid id, Survey updatedSurvey)
-        {
-            await Get(id);
-            await surveyRepository.Update(id, updatedSurvey);
-        }
-
-        public async Task Delete(Guid id)
-        {
-            await Get(id);
-            await surveyRepository.Delete(id);
-        }
+    public async Task DeleteAsync(Guid id)
+    {
+        await GetByIdAsync(id);
+        await surveyRepository.DeleteAsync(id);
     }
 }
