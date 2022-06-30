@@ -13,11 +13,13 @@
         //public object Validation { get; set; }
     }
 
+    // TODO: move to separate file
     public enum QuestionDefinitionType
     {
 
     }
 
+    // TODO: move to separate file
     public enum QuestionDefinitionUIType
     {
 

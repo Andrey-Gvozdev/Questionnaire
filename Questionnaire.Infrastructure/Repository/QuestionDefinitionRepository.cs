@@ -22,9 +22,12 @@ namespace Questionnaire.Infrastructure.Repository
         public async Task<QuestionDefinition> Get(Guid id) =>
             await questionDefinitionCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
+        // TODO: exception handling, for MongoDB - at least handling duplicate key exception
         public async Task Create(QuestionDefinition newQuestionDefinition) =>
             await questionDefinitionCollection.InsertOneAsync(newQuestionDefinition);
 
+        // TODO: replace is not the same as update, this operation usually called "upsert" (update + insert),
+        // please, make sure you really want update operation to be implemented as upsert
         public async Task Update(Guid id, QuestionDefinition updatedQuestionDefinition) =>
             await questionDefinitionCollection.ReplaceOneAsync(x => x.Id == id, updatedQuestionDefinition);
 

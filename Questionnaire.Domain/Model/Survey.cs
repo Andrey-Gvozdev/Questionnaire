@@ -6,6 +6,7 @@
 
         public string Name { get; set; }
 
+        // TODO: typo
         public string Discription { get; set; }
 
         public List<Question> Questions { get; set; }
