@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using Questionnaire.Domain.Model;
+using MongoDB.Bson;
 
 namespace Questionnaire.Infrastructure.Repository
 {
@@ -20,15 +21,21 @@ namespace Questionnaire.Infrastructure.Repository
             await questionsCollection.Find(_ => true).ToListAsync();
 
         public async Task<Question> Get(Guid id) =>
-            await questionsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            await questionsCollection.Find(q => q.Id == id).FirstOrDefaultAsync();
 
         public async Task Create(Question newQuestion) =>
             await questionsCollection.InsertOneAsync(newQuestion);
 
         public async Task Update(Guid id, Question updatedQuestion) =>
-            await questionsCollection.ReplaceOneAsync(x => x.Id == id, updatedQuestion);
+            await questionsCollection.UpdateOneAsync(
+                Builders<Question>.Filter.Eq(q => q.Id, id),
+                Builders<Question>.Update
+                    .Set(q => q.Definition, updatedQuestion.Definition)
+                    .Set(q => q.QuestionText, updatedQuestion.QuestionText)
+                    .Set(q => q.IsRequired, updatedQuestion.IsRequired)
+                );
 
         public async Task Delete(Guid id) =>
-            await questionsCollection.DeleteOneAsync(x => x.Id == id);
+            await questionsCollection.DeleteOneAsync(q => q.Id == id);
     }
 }
