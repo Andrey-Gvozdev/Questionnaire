@@ -26,7 +26,13 @@ public class SurveyRepository : ISurveyRepository
         await surveyCollection.InsertOneAsync(newSurvey);
 
     public async Task UpdateAsync(Guid id, Survey updatedSurvey) =>
-        await surveyCollection.ReplaceOneAsync(x => x.Id == id, updatedSurvey);
+        await surveyCollection.UpdateOneAsync(
+            Builders<Survey>.Filter.Eq(s => s.Id, id),
+            Builders<Survey>.Update
+                .Set(s => s.Name, updatedSurvey.Name)
+                .Set(s => s.Discription, updatedSurvey.Discription)
+                .Set(s => s.Questions, updatedSurvey.Questions)
+            );
 
     public async Task DeleteAsync(Guid id) =>
         await surveyCollection.DeleteOneAsync(x => x.Id == id);

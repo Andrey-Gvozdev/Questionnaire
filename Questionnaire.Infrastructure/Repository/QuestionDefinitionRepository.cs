@@ -26,7 +26,14 @@ public class QuestionDefinitionRepository : IQuestionDefinitionRepository
         await questionDefinitionCollection.InsertOneAsync(newQuestionDefinition);
 
     public async Task UpdateAsync(Guid id, QuestionDefinition updatedQuestionDefinition) =>
-        await questionDefinitionCollection.ReplaceOneAsync(x => x.Id == id, updatedQuestionDefinition);
+        await questionDefinitionCollection.UpdateOneAsync(
+            Builders<QuestionDefinition>.Filter.Eq(qd => qd.Id, id),
+            Builders<QuestionDefinition>.Update
+                .Set(qd => qd.Name, updatedQuestionDefinition.Name)
+                .Set(qd => qd.Type, updatedQuestionDefinition.Type)
+                .Set(qd => qd.UIType, updatedQuestionDefinition.UIType)
+                //.Set(qd => qd.Validation, updatedQuestionDefinition.Validation)
+            );
 
     public async Task DeleteAsync(Guid id) =>
         await questionDefinitionCollection.DeleteOneAsync(x => x.Id == id);

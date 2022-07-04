@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using Questionnaire.Domain.Model;
+using MongoDB.Bson;
 
 namespace Questionnaire.Infrastructure.Repository;
 
@@ -26,7 +27,13 @@ public class QuestionRepository : IQuestionRepository
         await questionsCollection.InsertOneAsync(newQuestion);
 
     public async Task UpdateAsync(Guid id, Question updatedQuestion) =>
-        await questionsCollection.ReplaceOneAsync(x => x.Id == id, updatedQuestion);
+        await questionsCollection.UpdateOneAsync(
+            Builders<Question>.Filter.Eq(q => q.Id, id),
+            Builders<Question>.Update
+                .Set(q => q.Definition, updatedQuestion.Definition)
+                .Set(q => q.QuestionText, updatedQuestion.QuestionText)
+                .Set(q => q.IsRequired, updatedQuestion.IsRequired)
+            );
 
     public async Task DeleteAsync(Guid id) =>
         await questionsCollection.DeleteOneAsync(x => x.Id == id);
