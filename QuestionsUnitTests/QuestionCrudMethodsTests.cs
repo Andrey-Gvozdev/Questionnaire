@@ -122,9 +122,45 @@ public class QuestionCrudMethodsTests
         SetupQuestionRepositoryUpdateMethod(id, updatedQuestion);
         SetupQuestionRepositoryGetByIdMethod(id);
 
-        Func<Task> createAction = async () => await questionCrudService.UpdateAsync(id, updatedQuestion);
+        Func<Task> updateAction = async () => await questionCrudService.UpdateAsync(id, updatedQuestion);
 
-        await createAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
+        await updateAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
+
+        DisposeRunner();
+    }
+
+    [Test]
+    public async Task QuestionCrudService_DeleteAsync_Valid_Success()
+    {
+        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
+        Question question = CreateQuestion(id);
+        await testCollection.InsertOneAsync(question);
+
+        SetupQuestionRepositoryGetByIdMethod(id);
+        SetupQuestionRepositoryDeleteMethod(id);
+
+        Func<Task> deleteAction = async () => await questionCrudService.DeleteAsync(id);
+        Func<Task> getByIdAction = async () => await questionCrudService.GetByIdAsync(id);
+
+        await deleteAction.Should().NotThrowAsync<NotFoundException>();
+        SetupQuestionRepositoryGetByIdMethod(id);
+        await getByIdAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
+        
+        DisposeRunner();
+    }
+
+    [Test]
+    public async Task QuestionCrudService_DeleteAsync_InValid_Success()
+    {
+        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
+        Question question = CreateQuestion(id);
+
+        SetupQuestionRepositoryGetByIdMethod(id);
+        SetupQuestionRepositoryDeleteMethod(id);
+
+        Func<Task> deleteAction = async () => await questionCrudService.DeleteAsync(id);
+
+        await deleteAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
 
         DisposeRunner();
     }
@@ -173,5 +209,10 @@ public class QuestionCrudMethodsTests
                 .Set(q => q.QuestionText, updatedQuestion.QuestionText)
                 .Set(q => q.IsRequired, updatedQuestion.IsRequired)
             ));
+    }
+
+    private void SetupQuestionRepositoryDeleteMethod(Guid id)
+    {
+        questionRepository.Setup(rep => rep.DeleteAsync(id)).Returns(testCollection.DeleteOneAsync(x => x.Id == id));
     }
 }
