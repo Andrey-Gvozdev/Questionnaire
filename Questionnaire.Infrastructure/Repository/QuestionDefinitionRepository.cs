@@ -32,7 +32,7 @@ public class QuestionDefinitionRepository : IQuestionDefinitionRepository
                 .Set(qd => qd.Name, updatedQuestionDefinition.Name)
                 .Set(qd => qd.Type, updatedQuestionDefinition.Type)
                 .Set(qd => qd.UIType, updatedQuestionDefinition.UIType)
-                //.Set(qd => qd.Validation, updatedQuestionDefinition.Validation)
+                .Set(qd => qd.Validation, updatedQuestionDefinition.Validation)
             );
 
     public async Task DeleteAsync(Guid id) =>

@@ -10,5 +10,5 @@ public class QuestionDefinition
 
     public QuestionDefinitionUIType UIType { get; set; }
 
-    //public object Validation { get; set; }
+    public Validation Validation { get; set; }
 }
