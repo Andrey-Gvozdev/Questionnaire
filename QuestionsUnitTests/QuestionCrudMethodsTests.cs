@@ -91,6 +91,44 @@ public class QuestionCrudMethodsTests
         DisposeRunner();
     }
 
+    [Test]
+    public async Task QuestionCrudService_UpdateAsync_Valid_Success()
+    {
+        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
+        string changedText = "changedText";
+        Question question = CreateQuestion(id);
+        Question updatedQuestion = CreateQuestion(id, changedText);
+        await testCollection.InsertOneAsync(question);
+
+        SetupQuestionRepositoryUpdateMethod(id, updatedQuestion);
+        SetupQuestionRepositoryGetByIdMethod(id);
+        await questionCrudService.UpdateAsync(id, updatedQuestion);
+
+        SetupQuestionRepositoryGetByIdMethod(id);
+        Question expectedQuestion = await questionCrudService.GetByIdAsync(id);
+
+        expectedQuestion.QuestionText.Should().Be(changedText);
+
+        DisposeRunner();
+    }
+
+    [Test]
+    public async Task QuestionCrudService_UpdateAsync_InValid_Success()
+    {
+        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
+        string changedText = "changedText";
+        Question updatedQuestion = CreateQuestion(id, changedText);
+
+        SetupQuestionRepositoryUpdateMethod(id, updatedQuestion);
+        SetupQuestionRepositoryGetByIdMethod(id);
+
+        Func<Task> createAction = async () => await questionCrudService.UpdateAsync(id, updatedQuestion);
+
+        await createAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
+
+        DisposeRunner();
+    }
+
     private void CreateConnection()
     {
         runner = MongoDbRunner.Start();
@@ -104,11 +142,12 @@ public class QuestionCrudMethodsTests
         runner.Dispose();
     }
 
-    private Question CreateQuestion(Guid id)
+    private Question CreateQuestion(Guid id, string questionText = "defaultText")
     {
         Fixture fixture = new Fixture();
         Question question = fixture.Build<Question>()
             .With(q => q.Id, id)
+            .With(q => q.QuestionText, questionText)
             .Without(q => q.Definition)
             .Create();
 
@@ -123,5 +162,16 @@ public class QuestionCrudMethodsTests
     private void SetupQuestionRepositoryGetByIdMethod(Guid id)
     {
         questionRepository.Setup(rep => rep.GetByIdAsync(id)).Returns(testCollection.Find(x => x.Id == id).FirstOrDefaultAsync());
+    }
+
+    private void SetupQuestionRepositoryUpdateMethod(Guid id, Question updatedQuestion)
+    {
+        questionRepository.Setup(rep => rep.UpdateAsync(id, updatedQuestion)).Returns(testCollection.UpdateOneAsync(
+            Builders<Question>.Filter.Eq(q => q.Id, id),
+            Builders<Question>.Update
+                .Set(q => q.Definition, updatedQuestion.Definition)
+                .Set(q => q.QuestionText, updatedQuestion.QuestionText)
+                .Set(q => q.IsRequired, updatedQuestion.IsRequired)
+            ));
     }
 }
