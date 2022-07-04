@@ -8,89 +8,121 @@ using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;
 using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
+using Questionnaire.Domain.CustomExceptions;
 
-namespace QuestionsUnitTests
+namespace QuestionsUnitTests;
+
+public class QuestionCrudMethodsTests
 {
-    public class QuestionCrudMethodsTests
+    MongoDbRunner runner;
+    string databaseName = "Test";
+    string testCollectionName = "TestCollection";
+    IMongoCollection<Question> testCollection;
+    IMongoDatabase database;
+    IMongoClient client;
+    Mock<IQuestionRepository> questionRepository = new Mock<IQuestionRepository>();
+    QuestionCrudService questionCrudService;
+
+    [SetUp]
+    public void Setup()
     {
-        MongoDbRunner runner;
-        string databaseName = "Test";
-        string testCollectionName = "TestCollection";
-        IMongoCollection<Question> testCollection;
-        IMongoDatabase database;
-        IMongoClient client;
-        Mock<IQuestionRepository> questionRepository = new Mock<IQuestionRepository>();
-        QuestionCrudService questionCrudService;
+        CreateConnection();
+        questionCrudService = new QuestionCrudService(questionRepository.Object);
+    }
 
-        internal void CreateConnection()
-        {
-            runner = MongoDbRunner.Start();
-            client = new MongoClient(runner.ConnectionString);
-            database = client.GetDatabase(databaseName);
-            testCollection = database.GetCollection<Question>(testCollectionName);
-        }
+    [Test]
+    public async Task QuestionCrudService_GetByIdAsync_Valid_Success()
+    {
+        Question question = CreateQuestion(new Guid("1fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        await testCollection.InsertOneAsync(question);
 
-        private Question CreateQuestion(Guid id)
-        {
-            Fixture fixture = new Fixture();
-            Question question = fixture.Build<Question>()
-                .With(q => q.Id, id)
-                .Without(q => q.Definition)
-                .Create();
+        SetupQuestionRepositoryGetByIdMethod(question.Id);
+        Question expectedQuestion = await questionCrudService.GetByIdAsync(question.Id);
 
-            return question;
-        }
+        expectedQuestion.Id.Should().Be(question.Id);
 
-        private void SetupQuestionRepositoryCreateMethod(Question question)
-        {
-            questionRepository.Setup(rep => rep.CreateAsync(question)).Returns(testCollection.InsertOneAsync(question));
-        }
+        DisposeRunner();
+    }
 
-        private void SetupQuestionRepositoryGetByIdMethod(Question question)
-        {
-            questionRepository.Setup(rep => rep.GetByIdAsync(question.Id)).Returns(testCollection.Find(x => x.Id == question.Id).FirstOrDefaultAsync());
-        }
+    [Test]
+    public async Task QuestionCrudService_GetByIdAsync_InValid_Success()
+    {
+        Question question = CreateQuestion(new Guid("1fa85f64-5717-4562-b3fc-2c963f66afa6"));
 
-        [SetUp]
-        public void Setup()
-        {
-            CreateConnection();
-            questionCrudService = new QuestionCrudService(questionRepository.Object);
-        }
+        SetupQuestionRepositoryGetByIdMethod(question.Id);
+        Func<Task> getByIdAction = async () => await questionCrudService.GetByIdAsync(question.Id);
 
-        [Test]
-        public async Task QuestionCrudService_CreateAsync_InValid_Success()
-        {
-            Question question = CreateQuestion(new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        await getByIdAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
 
-            SetupQuestionRepositoryCreateMethod(question);
-            await questionCrudService.CreateAsync(question);
+        DisposeRunner();
+    }
 
-            SetupQuestionRepositoryCreateMethod(question);
-            SetupQuestionRepositoryGetByIdMethod(question);
-            Func<Task> createAction = async () => await questionCrudService.CreateAsync(question);
+    [Test]
+    public async Task QuestionCrudService_CreateAsync_Valid_Success()
+    {
+        Question question = CreateQuestion(new Guid("5fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        Question questionVithDifferentId = CreateQuestion(new Guid("4fa85f64-5717-4562-b3fc-2c963f66afa6"));
 
-            await createAction.Should().ThrowAsync<ValidationException>();
-            
-            Cleanup stuff = () => runner.Dispose();
-        }
+        SetupQuestionRepositoryCreateMethod(question);
+        await questionCrudService.CreateAsync(question);
 
-        [Test]
-        public async Task QuestionCrudService_CreateAsync_Valid_Success()
-        {
-            Question question = CreateQuestion(new Guid("5fa85f64-5717-4562-b3fc-2c963f66afa6"));
-            Question questionVithDifferentId = CreateQuestion(new Guid("4fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        SetupQuestionRepositoryCreateMethod(questionVithDifferentId);
+        await questionCrudService.CreateAsync(questionVithDifferentId);
+        var amountQuestions = await testCollection.Find(_ => true).CountDocumentsAsync();
 
-            SetupQuestionRepositoryCreateMethod(question);
-            await questionCrudService.CreateAsync(question);
+        amountQuestions.Should().Be(Convert.ToInt64(2));
 
-            SetupQuestionRepositoryCreateMethod(questionVithDifferentId);
-            await questionCrudService.CreateAsync(questionVithDifferentId);
-            var amountQuestions = await testCollection.Find(_ => true).CountDocumentsAsync();
+        DisposeRunner();
+    }
 
-            amountQuestions.Should().Be(Convert.ToInt64(2));
+    [Test]
+    public async Task QuestionCrudService_CreateAsync_InValid_Success()
+    {
+        Question question = CreateQuestion(new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
 
-            Cleanup stuff = () => runner.Dispose();
-        }
+        SetupQuestionRepositoryCreateMethod(question);
+        await questionCrudService.CreateAsync(question);
+
+        SetupQuestionRepositoryCreateMethod(question);
+        SetupQuestionRepositoryGetByIdMethod(question.Id);
+        Func<Task> createAction = async () => await questionCrudService.CreateAsync(question);
+
+        await createAction.Should().ThrowAsync<ValidationException>();
+
+        DisposeRunner();
+    }
+
+    private void CreateConnection()
+    {
+        runner = MongoDbRunner.Start();
+        client = new MongoClient(runner.ConnectionString);
+        database = client.GetDatabase(databaseName);
+        testCollection = database.GetCollection<Question>(testCollectionName);
+    }
+
+    private void DisposeRunner()
+    {
+        runner.Dispose();
+    }
+
+    private Question CreateQuestion(Guid id)
+    {
+        Fixture fixture = new Fixture();
+        Question question = fixture.Build<Question>()
+            .With(q => q.Id, id)
+            .Without(q => q.Definition)
+            .Create();
+
+        return question;
+    }
+
+    private void SetupQuestionRepositoryCreateMethod(Question question)
+    {
+        questionRepository.Setup(rep => rep.CreateAsync(question)).Returns(testCollection.InsertOneAsync(question));
+    }
+
+    private void SetupQuestionRepositoryGetByIdMethod(Guid id)
+    {
+        questionRepository.Setup(rep => rep.GetByIdAsync(id)).Returns(testCollection.Find(x => x.Id == id).FirstOrDefaultAsync());
     }
 }
