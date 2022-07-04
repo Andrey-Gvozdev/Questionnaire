@@ -1,42 +1,46 @@
-﻿using Questionnaire.Domain.CustomExceptions;
+﻿using MongoDB.Driver;
+using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
+using System.ComponentModel.DataAnnotations;
 
-namespace Questionnaire.Domain.Services.CRUDServices
+namespace Questionnaire.Domain.Services.CRUDServices;
+
+public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
 {
-    public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
+    private readonly IQuestionDefinitionRepository questionDefinitionRepository;
+
+    public QuestionDefinitionCrudService(IQuestionDefinitionRepository repository)
     {
-        private readonly IQuestionDefinitionRepository questionDefinitionRepository;
+        questionDefinitionRepository = repository;
+    }
 
-        public QuestionDefinitionCrudService(IQuestionDefinitionRepository repository)
-        {
-            questionDefinitionRepository = repository;
-        }
+    public async Task<List<QuestionDefinition>> GetAllAsync() =>
+        await questionDefinitionRepository.GetAllAsync();
 
-        public async Task<List<QuestionDefinition>> Get() =>
-            await questionDefinitionRepository.Get();
+    public async Task<QuestionDefinition> GetByIdAsync(Guid id)
+    {
+        var question = await questionDefinitionRepository.GetByIdAsync(id);
 
-        public async Task<QuestionDefinition> Get(Guid id)
-        {
-            var question = await questionDefinitionRepository.Get(id);
+        return question ?? throw new NotFoundException("Item not found");
+    }
 
-            return question ?? throw new NotFoundException("Item not found");
-        }
+    public async Task CreateAsync(QuestionDefinition newQuestionDefinition)
+    {
+        if (await questionDefinitionRepository.GetByIdAsync(newQuestionDefinition.Id) != null)
+            throw new ValidationException(String.Concat("Item vith id: ", newQuestionDefinition.Id, " already exists"));
+        else
+            await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
+    }
 
-        public async Task Create(QuestionDefinition newQuestionDefinition)
-        {
-            await questionDefinitionRepository.Create(newQuestionDefinition);
-        }
+    public async Task UpdateAsync(Guid id, QuestionDefinition updatedQuestionDefinition)
+    {
+        await GetByIdAsync(id);
+        await questionDefinitionRepository.UpdateAsync(id, updatedQuestionDefinition);
+    }
 
-        public async Task Update(Guid id, QuestionDefinition updatedQuestionDefinition)
-        {
-            await Get(id);
-            await questionDefinitionRepository.Update(id, updatedQuestionDefinition);
-        }
-
-        public async Task Delete(Guid id)
-        {
-            await Get(id);
-            await questionDefinitionRepository.Delete(id);
-        }
+    public async Task DeleteAsync(Guid id)
+    {
+        await GetByIdAsync(id);
+        await questionDefinitionRepository.DeleteAsync(id);
     }
 }

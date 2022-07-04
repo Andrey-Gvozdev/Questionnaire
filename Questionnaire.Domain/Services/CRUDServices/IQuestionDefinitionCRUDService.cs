@@ -1,17 +1,16 @@
 ﻿using Questionnaire.Domain.Model;
 
-namespace Questionnaire.Domain.Services.CRUDServices
+namespace Questionnaire.Domain.Services.CRUDServices;
+
+public interface IQuestionDefinitionCrudService
 {
-    public interface IQuestionDefinitionCrudService
-    {
-        Task<List<QuestionDefinition>> Get();
+    Task<List<QuestionDefinition>> GetAllAsync();
 
-        Task<QuestionDefinition> Get(Guid id);
+    Task<QuestionDefinition> GetByIdAsync(Guid id);
 
-        Task Create(QuestionDefinition newQuestionDefinition);
+    Task CreateAsync(QuestionDefinition newQuestionDefinition);
 
-        Task Update(Guid id, QuestionDefinition updatedQuestionDefinition);
+    Task UpdateAsync(Guid id, QuestionDefinition updatedQuestionDefinition);
 
-        Task Delete(Guid id);
-    }
+    Task DeleteAsync(Guid id);
 }
