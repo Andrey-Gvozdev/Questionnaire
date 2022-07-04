@@ -30,7 +30,7 @@ public class SurveyRepository : ISurveyRepository
             Builders<Survey>.Filter.Eq(s => s.Id, id),
             Builders<Survey>.Update
                 .Set(s => s.Name, updatedSurvey.Name)
-                .Set(s => s.Discription, updatedSurvey.Discription)
+                .Set(s => s.Description, updatedSurvey.Description)
                 .Set(s => s.Questions, updatedSurvey.Questions)
             );
 

@@ -20,6 +20,7 @@ public class SurveysController : ControllerBase
         await surveyCrudService.GetAllAsync();
 
     [HttpGet("{id}")]
+    [ActionName("GEtByIdAsync")]
     public Task<Survey> GetByIdAsync(Guid id)
     {
         return surveyCrudService.GetByIdAsync(id);
