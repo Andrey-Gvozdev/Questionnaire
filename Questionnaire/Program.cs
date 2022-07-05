@@ -16,8 +16,11 @@ builder.Services.AddTransient<IQuestionCrudService, QuestionCrudService>();
 builder.Services.AddTransient<IQuestionValidationService, QuestionValidationService>();
 builder.Services.AddTransient<IQuestionDefinitionRepository, QuestionDefinitionRepository>();
 builder.Services.AddTransient<IQuestionDefinitionCrudService, QuestionDefinitionCrudService>();
+builder.Services.AddTransient<IQuestionDefinitionValidationService, QuestionDefinitionValidationService>();
 builder.Services.AddTransient<ISurveyRepository, SurveyRepository>();
 builder.Services.AddTransient<ISurveyCrudService, SurveyCrudService>();
+builder.Services.AddTransient<ISurveyValidationService, SurveyValidationService>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
