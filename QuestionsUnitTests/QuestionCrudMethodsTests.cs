@@ -13,14 +13,16 @@ namespace QuestionsUnitTests;
 
 public class QuestionCrudMethodsTests
 {
-    MongoDbRunner runner;
-    string databaseName = "Test";
-    string testCollectionName = "TestCollection";
-    IMongoCollection<Question> testCollection;
-    IMongoDatabase database;
-    IMongoClient client;
-    Mock<IQuestionRepository> questionRepository = new Mock<IQuestionRepository>();
-    QuestionCrudService questionCrudService;
+    private const string databaseName = "Test";
+    private const string testCollectionName = "TestCollection";
+    
+    private MongoDbRunner runner;
+    private IMongoCollection<Question> testCollection;
+    private IMongoDatabase database;
+    private IMongoClient client;
+    private readonly Mock<IQuestionRepository> questionRepository = new Mock<IQuestionRepository>();
+    private QuestionCrudService questionCrudService;
+    private Fixture fixture = new Fixture();
 
     [SetUp]
     public void Setup()
@@ -30,26 +32,27 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_GetByIdAsync_Valid_Success()
+    public async Task GetByIdAsync_ShouldGet()
     {
-        Question question = CreateQuestion(new Guid("1fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        var question = CreateQuestion(Guid.NewGuid());
         await testCollection.InsertOneAsync(question);
 
         SetupQuestionRepositoryGetByIdMethod(question.Id);
-        Question expectedQuestion = await questionCrudService.GetByIdAsync(question.Id);
+        var expectedQuestion = await questionCrudService.GetByIdAsync(question.Id);
 
+        expectedQuestion.Should().NotBeNull();
         expectedQuestion.Id.Should().Be(question.Id);
 
         DisposeRunner();
     }
 
     [Test]
-    public async Task QuestionCrudService_GetByIdAsync_InValid_Success()
+    public async Task GetByIdAsync_ShouldThrowIfQuestionNotExist()
     {
-        Question question = CreateQuestion(new Guid("1fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        var question = CreateQuestion(Guid.NewGuid());
 
         SetupQuestionRepositoryGetByIdMethod(question.Id);
-        Func<Task> getByIdAction = async () => await questionCrudService.GetByIdAsync(question.Id);
+        var getByIdAction = async () => await questionCrudService.GetByIdAsync(question.Id);
 
         await getByIdAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
 
@@ -57,10 +60,10 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_CreateAsync_Valid_Success()
+    public async Task CreateAsync_ShouldCreate()
     {
-        Question question = CreateQuestion(new Guid("5fa85f64-5717-4562-b3fc-2c963f66afa6"));
-        Question questionVithDifferentId = CreateQuestion(new Guid("4fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        var question = CreateQuestion(Guid.NewGuid());
+        var questionVithDifferentId = CreateQuestion(Guid.NewGuid());
 
         SetupQuestionRepositoryCreateMethod(question);
         await questionCrudService.CreateAsync(question);
@@ -75,16 +78,16 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_CreateAsync_InValid_Success()
+    public async Task CreateAsync_ShouldThrowIfValidationFailed()
     {
-        Question question = CreateQuestion(new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
+        var question = CreateQuestion(Guid.NewGuid());
 
         SetupQuestionRepositoryCreateMethod(question);
         await questionCrudService.CreateAsync(question);
 
         SetupQuestionRepositoryCreateMethod(question);
         SetupQuestionRepositoryGetByIdMethod(question.Id);
-        Func<Task> createAction = async () => await questionCrudService.CreateAsync(question);
+        var createAction = async () => await questionCrudService.CreateAsync(question);
 
         await createAction.Should().ThrowAsync<ValidationException>();
 
@@ -92,20 +95,20 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_UpdateAsync_Valid_Success()
+    public async Task UpdateAsync_ShouldUpdate()
     {
-        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
-        string changedText = "changedText";
-        Question question = CreateQuestion(id);
-        Question updatedQuestion = CreateQuestion(id, changedText);
-        await testCollection.InsertOneAsync(question);
+        var changedText = "changedText";
+        var id = Guid.NewGuid();
+        var question = CreateQuestion(id);
+        var updatedQuestion = CreateQuestion(id, changedText);
 
+        await testCollection.InsertOneAsync(question);
         SetupQuestionRepositoryUpdateMethod(id, updatedQuestion);
         SetupQuestionRepositoryGetByIdMethod(id);
         await questionCrudService.UpdateAsync(id, updatedQuestion);
 
         SetupQuestionRepositoryGetByIdMethod(id);
-        Question expectedQuestion = await questionCrudService.GetByIdAsync(id);
+        var expectedQuestion = await questionCrudService.GetByIdAsync(id);
 
         expectedQuestion.QuestionText.Should().Be(changedText);
 
@@ -113,16 +116,16 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_UpdateAsync_InValid_Success()
+    public async Task UpdateAsync_ShouldThrowIfValidationFailed()
     {
-        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
-        string changedText = "changedText";
-        Question updatedQuestion = CreateQuestion(id, changedText);
+        var changedText = "changedText";
+        var id = Guid.NewGuid();
+        var updatedQuestion = CreateQuestion(id, changedText);
 
         SetupQuestionRepositoryUpdateMethod(id, updatedQuestion);
         SetupQuestionRepositoryGetByIdMethod(id);
 
-        Func<Task> updateAction = async () => await questionCrudService.UpdateAsync(id, updatedQuestion);
+        var updateAction = async () => await questionCrudService.UpdateAsync(id, updatedQuestion);
 
         await updateAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
 
@@ -130,17 +133,18 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_DeleteAsync_Valid_Success()
+    public async Task DeleteAsync_ShouldDele()
     {
-        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
-        Question question = CreateQuestion(id);
+        var id = Guid.NewGuid();
+        var question = CreateQuestion(id);
+        
         await testCollection.InsertOneAsync(question);
 
         SetupQuestionRepositoryGetByIdMethod(id);
         SetupQuestionRepositoryDeleteMethod(id);
 
-        Func<Task> deleteAction = async () => await questionCrudService.DeleteAsync(id);
-        Func<Task> getByIdAction = async () => await questionCrudService.GetByIdAsync(id);
+        var deleteAction = async () => await questionCrudService.DeleteAsync(id);
+        var getByIdAction = async () => await questionCrudService.GetByIdAsync(id);
 
         await deleteAction.Should().NotThrowAsync<NotFoundException>();
         SetupQuestionRepositoryGetByIdMethod(id);
@@ -150,15 +154,15 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
-    public async Task QuestionCrudService_DeleteAsync_InValid_Success()
+    public async Task DeleteAsync_ShouldThrowIfValidationFailed()
     {
-        Guid id = new Guid("9fa85f64-5717-4562-b3fc-2c963f66afa6");
-        Question question = CreateQuestion(id);
+        var id = Guid.NewGuid();
+        var question = CreateQuestion(id);
 
         SetupQuestionRepositoryGetByIdMethod(id);
         SetupQuestionRepositoryDeleteMethod(id);
 
-        Func<Task> deleteAction = async () => await questionCrudService.DeleteAsync(id);
+        var deleteAction = async () => await questionCrudService.DeleteAsync(id);
 
         await deleteAction.Should().ThrowAsync<NotFoundException>().WithMessage("Item not found");
 
@@ -173,15 +177,15 @@ public class QuestionCrudMethodsTests
         testCollection = database.GetCollection<Question>(testCollectionName);
     }
 
-    private void DisposeRunner()
+    [TearDown]
+    public void DisposeRunner()
     {
         runner.Dispose();
     }
 
     private Question CreateQuestion(Guid id, string questionText = "defaultText")
     {
-        Fixture fixture = new Fixture();
-        Question question = fixture.Build<Question>()
+        var question = fixture.Build<Question>()
             .With(q => q.Id, id)
             .With(q => q.QuestionText, questionText)
             .Without(q => q.Definition)
@@ -192,27 +196,35 @@ public class QuestionCrudMethodsTests
 
     private void SetupQuestionRepositoryCreateMethod(Question question)
     {
-        questionRepository.Setup(rep => rep.CreateAsync(question)).Returns(testCollection.InsertOneAsync(question));
+        questionRepository
+            .Setup(rep => rep.CreateAsync(question))
+            .Returns(testCollection.InsertOneAsync(question));
     }
 
     private void SetupQuestionRepositoryGetByIdMethod(Guid id)
     {
-        questionRepository.Setup(rep => rep.GetByIdAsync(id)).Returns(testCollection.Find(x => x.Id == id).FirstOrDefaultAsync());
+        questionRepository
+            .Setup(rep => rep.GetByIdAsync(id))
+            .Returns(testCollection.Find(x => x.Id == id).FirstOrDefaultAsync());
     }
 
     private void SetupQuestionRepositoryUpdateMethod(Guid id, Question updatedQuestion)
     {
-        questionRepository.Setup(rep => rep.UpdateAsync(id, updatedQuestion)).Returns(testCollection.UpdateOneAsync(
-            Builders<Question>.Filter.Eq(q => q.Id, id),
-            Builders<Question>.Update
-                .Set(q => q.Definition, updatedQuestion.Definition)
-                .Set(q => q.QuestionText, updatedQuestion.QuestionText)
-                .Set(q => q.IsRequired, updatedQuestion.IsRequired)
+        questionRepository
+            .Setup(rep => rep.UpdateAsync(id, updatedQuestion))
+            .Returns(testCollection.UpdateOneAsync(
+                Builders<Question>.Filter.Eq(q => q.Id, id),
+                Builders<Question>.Update
+                    .Set(q => q.Definition, updatedQuestion.Definition)
+                    .Set(q => q.QuestionText, updatedQuestion.QuestionText)
+                    .Set(q => q.IsRequired, updatedQuestion.IsRequired)
             ));
     }
 
     private void SetupQuestionRepositoryDeleteMethod(Guid id)
     {
-        questionRepository.Setup(rep => rep.DeleteAsync(id)).Returns(testCollection.DeleteOneAsync(x => x.Id == id));
+        questionRepository
+            .Setup(rep => rep.DeleteAsync(id))
+            .Returns(testCollection.DeleteOneAsync(x => x.Id == id));
     }
 }
