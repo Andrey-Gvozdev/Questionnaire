@@ -14,6 +14,8 @@ public class Validation
 
     public bool IsRadioButtons { get; private set; }
 
+    // TODO: remove this constructor, the is no sense in constructor
+    // that allow to leave its parameters empty
     public Validation(int maxValue = 0, int minValue = 0, int maxLength = 0, int minLength = 0, bool isPersent = false, bool isRadioButtons = false)
     {
         MaxValue = maxValue;

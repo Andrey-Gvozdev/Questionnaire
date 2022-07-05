@@ -1,5 +1,7 @@
 ﻿namespace Questionnaire.Domain.Model;
 
+// TODO: Model folder is definetely a wrong place for this interface,
+// folder Data inside Domain project would work
 public interface IQuestionDefinitionRepository
 {
     Task<List<QuestionDefinition>> GetAllAsync();

@@ -19,6 +19,9 @@ public class QuestionsController : ControllerBase
     public async Task<List<Question>> GetAllAsync() =>
         await questionCRUDService.GetAllAsync();
 
+    // TODO: better to configure default naming convention
+    // to not suppress "async" postfix in AddControllers() method
+    // instead of specifying the same action name in [ActionName] attribute
     [HttpGet("{id}")]
     [ActionName("GEtByIdAsync")]
     public Task<Question> GetByIdAsync(Guid id)
