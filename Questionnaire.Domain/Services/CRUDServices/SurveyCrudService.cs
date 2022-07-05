@@ -21,11 +21,9 @@ public class SurveyCrudService : ISurveyCrudService
         return surveyRepository.GetAllAsync();
     }
 
-    public async Task<Survey> GetByIdAsync(Guid id)
+    public Task<Survey> GetByIdAsync(Guid id)
     {
-        var survey = await surveyRepository.GetByIdAsync(id);
-
-        return survey ?? throw new NotFoundException("Item not found");
+        return surveyRepository.GetByIdAsync(id) ?? throw new NotFoundException("Item not found");
     }
 
     public async Task CreateAsync(Survey newSurvey)
