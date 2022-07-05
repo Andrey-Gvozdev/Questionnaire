@@ -1,5 +1,4 @@
 using Hellang.Middleware.ProblemDetails;
-using MongoDB.Driver;
 using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;

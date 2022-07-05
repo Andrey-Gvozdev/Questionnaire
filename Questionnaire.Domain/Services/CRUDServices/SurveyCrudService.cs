@@ -1,5 +1,6 @@
 ﻿using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
+using Questionnaire.Domain.Services.ValidationServices;
 using System.ComponentModel.DataAnnotations;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
@@ -7,10 +8,12 @@ namespace Questionnaire.Domain.Services.CRUDServices;
 public class SurveyCrudService : ISurveyCrudService
 {
     private readonly ISurveyRepository surveyRepository;
+    private readonly ISurveyValidationService surveyValidationService;
 
-    public SurveyCrudService(ISurveyRepository repository)
+    public SurveyCrudService(ISurveyRepository repository, ISurveyValidationService surveyValidationService)
     {
         surveyRepository = repository;
+        this.surveyValidationService = surveyValidationService;
     }
 
     public async Task<List<Survey>> GetAllAsync() =>
@@ -27,13 +30,15 @@ public class SurveyCrudService : ISurveyCrudService
     {
         if (await surveyRepository.GetByIdAsync(newSurvey.Id) != null)
             throw new ValidationException(String.Concat("Item vith id: ", newSurvey.Id ," already exists"));
-        else
-            await surveyRepository.CreateAsync(newSurvey);
+        surveyValidationService.ValidationSurvey(newSurvey);
+
+        await surveyRepository.CreateAsync(newSurvey);
     }
 
     public async Task UpdateAsync(Guid id, Survey updatedSurvey)
     {
         await GetByIdAsync(id);
+        surveyValidationService.ValidationSurvey(updatedSurvey);
         await surveyRepository.UpdateAsync(id, updatedSurvey);
     }
 

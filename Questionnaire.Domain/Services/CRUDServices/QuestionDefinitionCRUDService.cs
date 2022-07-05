@@ -1,6 +1,6 @@
-﻿using MongoDB.Driver;
-using Questionnaire.Domain.CustomExceptions;
+﻿using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Model;
+using Questionnaire.Domain.Services.ValidationServices;
 using System.ComponentModel.DataAnnotations;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
@@ -8,10 +8,12 @@ namespace Questionnaire.Domain.Services.CRUDServices;
 public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
 {
     private readonly IQuestionDefinitionRepository questionDefinitionRepository;
+    private readonly IQuestionDefinitionValidationService questionDefinitionValidationService;
 
-    public QuestionDefinitionCrudService(IQuestionDefinitionRepository repository)
+    public QuestionDefinitionCrudService(IQuestionDefinitionRepository repository, IQuestionDefinitionValidationService questionDefinitionValidationService)
     {
         questionDefinitionRepository = repository;
+        this.questionDefinitionValidationService = questionDefinitionValidationService;
     }
 
     public async Task<List<QuestionDefinition>> GetAllAsync() =>
@@ -28,13 +30,15 @@ public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
     {
         if (await questionDefinitionRepository.GetByIdAsync(newQuestionDefinition.Id) != null)
             throw new ValidationException(String.Concat("Item vith id: ", newQuestionDefinition.Id, " already exists"));
-        else
-            await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
+        questionDefinitionValidationService.ValidationQuestion(newQuestionDefinition);
+        
+        await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
     }
 
     public async Task UpdateAsync(Guid id, QuestionDefinition updatedQuestionDefinition)
     {
         await GetByIdAsync(id);
+        questionDefinitionValidationService.ValidationQuestion(updatedQuestionDefinition);
         await questionDefinitionRepository.UpdateAsync(id, updatedQuestionDefinition);
     }
 
