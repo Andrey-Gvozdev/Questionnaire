@@ -2,7 +2,6 @@
 using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.ValidationServices;
-using System.ComponentModel.DataAnnotations;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
 
@@ -17,22 +16,19 @@ public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
         this.questionDefinitionValidationService = questionDefinitionValidationService;
     }
 
-    public async Task<List<QuestionDefinition>> GetAllAsync() =>
-        await questionDefinitionRepository.GetAllAsync();
+    public Task<List<QuestionDefinition>> GetAllAsync() 
+    { 
+        return questionDefinitionRepository.GetAllAsync(); 
+    }
 
-    public async Task<QuestionDefinition> GetByIdAsync(Guid id)
+    public Task<QuestionDefinition> GetByIdAsync(Guid id)
     {
-        var question = await questionDefinitionRepository.GetByIdAsync(id);
-
-        return question ?? throw new NotFoundException("Item not found");
+        return questionDefinitionRepository.GetByIdAsync(id) ?? throw new NotFoundException("Item not found");
     }
 
     public async Task CreateAsync(QuestionDefinition newQuestionDefinition)
     {
-        if (await questionDefinitionRepository.GetByIdAsync(newQuestionDefinition.Id) != null)
-            throw new ValidationException(String.Concat("Item vith id: ", newQuestionDefinition.Id, " already exists"));
         questionDefinitionValidationService.ValidationQuestion(newQuestionDefinition);
-        
         await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
     }
 

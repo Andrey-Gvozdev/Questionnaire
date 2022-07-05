@@ -2,7 +2,7 @@
 
 public class Question
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
     public QuestionDefinition Definition { get; set; }
 
