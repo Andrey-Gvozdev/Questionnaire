@@ -10,17 +10,5 @@ public class Validation
 
     public int MinLength { get; private set; }
 
-    public bool IsPersent { get; private set; }
-
     public bool IsRadioButtons { get; private set; }
-
-    public Validation(int maxValue = 0, int minValue = 0, int maxLength = 0, int minLength = 0, bool isPersent = false, bool isRadioButtons = false)
-    {
-        MaxValue = maxValue;
-        MinValue = minValue;
-        MaxLength = maxLength;
-        MinLength = minLength;
-        IsPersent = isPersent;
-        IsRadioButtons = isRadioButtons;
-    }
 }
