@@ -12,7 +12,7 @@ public class Validation
 
     public bool IsRadioButtons { get; private set; }
 
-    public Validation(int maxValue = int.MaxValue, int minValue = int.MinValue, int maxLength = 2000, int minLength = 0, bool isRadioButtons = false)
+    public Validation(int maxValue = 0, int minValue = 0, int maxLength = 0, int minLength = 0, bool isRadioButtons = false)
     {
         MaxValue = maxValue;
         MinValue = minValue;

@@ -1,9 +1,8 @@
 ﻿using Questionnaire.Domain.Model;
 
-namespace Questionnaire.Domain.Services.ValidationServices
+namespace Questionnaire.Domain.Services.ValidationServices;
+
+public interface IQuestionValidationService
 {
-    public interface IQuestionValidationService
-    {
-        public Task ValidationQuestion(Question question);
-    }
+    public Task ValidationQuestion(Question question);
 }

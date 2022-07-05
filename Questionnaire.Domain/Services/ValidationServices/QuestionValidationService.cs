@@ -2,30 +2,29 @@
 using Questionnaire.Domain.Services.CRUDServices;
 using System.ComponentModel.DataAnnotations;
 
-namespace Questionnaire.Domain.Services.ValidationServices
-{
-    public class QuestionValidationService : IQuestionValidationService
-    {
-        private IQuestionDefinitionCrudService questionDefinitionCrudService;
+namespace Questionnaire.Domain.Services.ValidationServices;
 
-        public QuestionValidationService(IQuestionDefinitionCrudService questionDefinitionCrudService)
+public class QuestionValidationService : IQuestionValidationService
+{
+    private IQuestionDefinitionCrudService questionDefinitionCrudService;
+
+    public QuestionValidationService(IQuestionDefinitionCrudService questionDefinitionCrudService)
+    {
+        this.questionDefinitionCrudService = questionDefinitionCrudService;
+    }
+    public async Task ValidationQuestion(Question question)
+    {
+        if (string.IsNullOrWhiteSpace(question.QuestionText))
         {
-            this.questionDefinitionCrudService = questionDefinitionCrudService;
+            throw new ValidationException("Question field can't be empty");
         }
-        public async Task ValidationQuestion(Question question)
+        try
         {
-            if (string.IsNullOrWhiteSpace(question.QuestionText))
-            {
-                throw new ValidationException("Question field can't be empty");
-            }
-            try
-            {
-                await questionDefinitionCrudService.GetByIdAsync(question.Definition.Id);
-            }
-            catch
-            {
-                throw new ValidationException("Selected Question Definition not found"); 
-            }
+            await questionDefinitionCrudService.GetByIdAsync(question.Definition.Id);
+        }
+        catch
+        {
+            throw new ValidationException("Selected Question Definition not found"); 
         }
     }
 }
