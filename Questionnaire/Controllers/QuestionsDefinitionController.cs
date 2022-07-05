@@ -16,8 +16,10 @@ public class QuestionsDefinitionController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<QuestionDefinition>> GetAllAsync() =>
-        await questionDefinitionCRUDService.GetAllAsync();
+    public Task<List<QuestionDefinition>> GetAllAsync()
+    {
+        return questionDefinitionCRUDService.GetAllAsync();
+    }
 
     [HttpGet("{id}")]
     public Task<QuestionDefinition> GetByIdAsync(Guid id)
@@ -38,7 +40,7 @@ public class QuestionsDefinitionController : ControllerBase
     {
         await questionDefinitionCRUDService.UpdateAsync(id, updatedQuestionDefinition);
 
-        return Ok("Item updated");
+        return Ok();
     }
 
     [HttpDelete("{id}")]
@@ -46,6 +48,6 @@ public class QuestionsDefinitionController : ControllerBase
     {
         await questionDefinitionCRUDService.DeleteAsync(id);
 
-        return Ok("Item deleted");
+        return Ok();
     }
 }

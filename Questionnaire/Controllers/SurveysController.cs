@@ -16,8 +16,10 @@ public class SurveysController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<Survey>> GetAllAsync() =>
-        await surveyCrudService.GetAllAsync();
+    public Task<List<Survey>> GetAllAsync()
+    {
+        return surveyCrudService.GetAllAsync();
+    }
 
     [HttpGet("{id}")]
     public Task<Survey> GetByIdAsync(Guid id)
@@ -38,7 +40,7 @@ public class SurveysController : ControllerBase
     {
         await surveyCrudService.UpdateAsync(id, updatedSurvey);
 
-        return Ok("Item updated");
+        return Ok();
     }
 
     [HttpDelete("{id}")]
@@ -46,6 +48,6 @@ public class SurveysController : ControllerBase
     {
         await surveyCrudService.DeleteAsync(id);
 
-        return Ok("Item deleted");
+        return Ok();
     }
 }
