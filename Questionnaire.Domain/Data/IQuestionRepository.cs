@@ -1,4 +1,6 @@
-﻿namespace Questionnaire.Domain.Model;
+﻿using Questionnaire.Domain.Model;
+
+namespace Questionnaire.Domain.Data;
 
 public interface IQuestionRepository
 {

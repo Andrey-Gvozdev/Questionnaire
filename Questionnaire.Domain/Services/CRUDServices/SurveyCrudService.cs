@@ -1,39 +1,42 @@
 ﻿using Questionnaire.Domain.CustomExceptions;
+using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Model;
-using System.ComponentModel.DataAnnotations;
+using Questionnaire.Domain.Services.ValidationServices;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
 
 public class SurveyCrudService : ISurveyCrudService
 {
     private readonly ISurveyRepository surveyRepository;
+    private readonly ISurveyValidationService surveyValidationService;
 
-    public SurveyCrudService(ISurveyRepository repository)
+    public SurveyCrudService(ISurveyRepository repository, ISurveyValidationService surveyValidationService)
     {
         surveyRepository = repository;
+        this.surveyValidationService = surveyValidationService;
     }
 
-    public async Task<List<Survey>> GetAllAsync() =>
-        await surveyRepository.GetAllAsync();
-
-    public async Task<Survey> GetByIdAsync(Guid id)
+    public Task<List<Survey>> GetAllAsync()
     {
-        var survey = await surveyRepository.GetByIdAsync(id);
+        return surveyRepository.GetAllAsync();
+    }
 
-        return survey ?? throw new NotFoundException("Item not found");
+    public Task<Survey> GetByIdAsync(Guid id)
+    {
+        return surveyRepository.GetByIdAsync(id) ?? throw new NotFoundException("Item not found");
     }
 
     public async Task CreateAsync(Survey newSurvey)
     {
-        if (await surveyRepository.GetByIdAsync(newSurvey.Id) != null)
-            throw new ValidationException(String.Concat("Item vith id: ", newSurvey.Id ," already exists"));
-        else
-            await surveyRepository.CreateAsync(newSurvey);
+        surveyValidationService.ValidationSurvey(newSurvey);
+
+        await surveyRepository.CreateAsync(newSurvey);
     }
 
     public async Task UpdateAsync(Guid id, Survey updatedSurvey)
     {
         await GetByIdAsync(id);
+        surveyValidationService.ValidationSurvey(updatedSurvey);
         await surveyRepository.UpdateAsync(id, updatedSurvey);
     }
 

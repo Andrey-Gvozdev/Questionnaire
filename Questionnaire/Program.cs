@@ -1,7 +1,8 @@
 using Hellang.Middleware.ProblemDetails;
 using Questionnaire.Domain.CustomExceptions;
-using Questionnaire.Domain.Model;
+using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Services.CRUDServices;
+using Questionnaire.Domain.Services.ValidationServices;
 using Questionnaire.Infrastructure;
 using Questionnaire.Infrastructure.Repository;
 using System.ComponentModel.DataAnnotations;
@@ -12,12 +13,15 @@ builder.Services.Configure<QuestionnaireDBSettings>(builder.Configuration.GetSec
 
 builder.Services.AddTransient<IQuestionRepository, QuestionRepository>();
 builder.Services.AddTransient<IQuestionCrudService, QuestionCrudService>();
+builder.Services.AddTransient<IQuestionValidationService, QuestionValidationService>();
 builder.Services.AddTransient<IQuestionDefinitionRepository, QuestionDefinitionRepository>();
 builder.Services.AddTransient<IQuestionDefinitionCrudService, QuestionDefinitionCrudService>();
+builder.Services.AddTransient<IQuestionDefinitionValidationService, QuestionDefinitionValidationService>();
 builder.Services.AddTransient<ISurveyRepository, SurveyRepository>();
 builder.Services.AddTransient<ISurveyCrudService, SurveyCrudService>();
+builder.Services.AddTransient<ISurveyValidationService, SurveyValidationService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt => opt.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails(options =>

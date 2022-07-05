@@ -1,40 +1,41 @@
-﻿using MongoDB.Driver;
-using Questionnaire.Domain.CustomExceptions;
+﻿using Questionnaire.Domain.CustomExceptions;
+using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Model;
-using System.ComponentModel.DataAnnotations;
+using Questionnaire.Domain.Services.ValidationServices;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
 
 public class QuestionDefinitionCrudService : IQuestionDefinitionCrudService
 {
     private readonly IQuestionDefinitionRepository questionDefinitionRepository;
+    private readonly IQuestionDefinitionValidationService questionDefinitionValidationService;
 
-    public QuestionDefinitionCrudService(IQuestionDefinitionRepository repository)
+    public QuestionDefinitionCrudService(IQuestionDefinitionRepository repository, IQuestionDefinitionValidationService questionDefinitionValidationService)
     {
         questionDefinitionRepository = repository;
+        this.questionDefinitionValidationService = questionDefinitionValidationService;
     }
 
-    public async Task<List<QuestionDefinition>> GetAllAsync() =>
-        await questionDefinitionRepository.GetAllAsync();
+    public Task<List<QuestionDefinition>> GetAllAsync() 
+    { 
+        return questionDefinitionRepository.GetAllAsync(); 
+    }
 
-    public async Task<QuestionDefinition> GetByIdAsync(Guid id)
+    public Task<QuestionDefinition> GetByIdAsync(Guid id)
     {
-        var question = await questionDefinitionRepository.GetByIdAsync(id);
-
-        return question ?? throw new NotFoundException("Item not found");
+        return questionDefinitionRepository.GetByIdAsync(id) ?? throw new NotFoundException("Item not found");
     }
 
     public async Task CreateAsync(QuestionDefinition newQuestionDefinition)
     {
-        if (await questionDefinitionRepository.GetByIdAsync(newQuestionDefinition.Id) != null)
-            throw new ValidationException(String.Concat("Item vith id: ", newQuestionDefinition.Id, " already exists"));
-        else
-            await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
+        questionDefinitionValidationService.ValidationQuestion(newQuestionDefinition);
+        await questionDefinitionRepository.CreateAsync(newQuestionDefinition);
     }
 
     public async Task UpdateAsync(Guid id, QuestionDefinition updatedQuestionDefinition)
     {
         await GetByIdAsync(id);
+        questionDefinitionValidationService.ValidationQuestion(updatedQuestionDefinition);
         await questionDefinitionRepository.UpdateAsync(id, updatedQuestionDefinition);
     }
 

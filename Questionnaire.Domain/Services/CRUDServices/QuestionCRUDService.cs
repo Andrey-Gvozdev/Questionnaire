@@ -1,39 +1,41 @@
 ﻿using Questionnaire.Domain.CustomExceptions;
+using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Model;
-using System.ComponentModel.DataAnnotations;
+using Questionnaire.Domain.Services.ValidationServices;
 
 namespace Questionnaire.Domain.Services.CRUDServices;
 
 public class QuestionCrudService : IQuestionCrudService
 {
     private readonly IQuestionRepository questionRepository;
+    IQuestionValidationService questionValidationService;
 
-    public QuestionCrudService(IQuestionRepository repository)
+    public QuestionCrudService(IQuestionRepository repository, IQuestionValidationService questionValidationService)
     {
         questionRepository = repository;
+        this.questionValidationService = questionValidationService;
     }
-    
-    public async Task<List<Question>> GetAllAsync() =>
-        await questionRepository.GetAllAsync();
 
-    public async Task<Question> GetByIdAsync(Guid id)
+    public Task<List<Question>> GetAllAsync() 
     {
-        var question = await questionRepository.GetByIdAsync(id);
+        return questionRepository.GetAllAsync(); 
+    }
 
-        return question ?? throw new NotFoundException("Item not found");
+    public Task<Question> GetByIdAsync(Guid id)
+    {
+        return questionRepository.GetByIdAsync(id) ?? throw new NotFoundException("Item not found");
     }
 
     public async Task CreateAsync(Question newQuestion)
     {
-        if (await questionRepository.GetByIdAsync(newQuestion.Id) != null)
-            throw new ValidationException(String.Concat("Item vith id: ", newQuestion.Id, " already exists"));
-        else
-            await questionRepository.CreateAsync(newQuestion);
+        await questionValidationService.ValidationQuestion(newQuestion);
+        await questionRepository.CreateAsync(newQuestion);
     }
 
     public async Task UpdateAsync(Guid id, Question updatedQuestion)
     {
         await GetByIdAsync(id);
+        await questionValidationService.ValidationQuestion(updatedQuestion);
         await questionRepository.UpdateAsync(id, updatedQuestion);
     }
     
