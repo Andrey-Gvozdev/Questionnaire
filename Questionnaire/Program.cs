@@ -1,6 +1,6 @@
 using Hellang.Middleware.ProblemDetails;
 using Questionnaire.Domain.CustomExceptions;
-using Questionnaire.Domain.Model;
+using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Services.CRUDServices;
 using Questionnaire.Domain.Services.ValidationServices;
 using Questionnaire.Infrastructure;

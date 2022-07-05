@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Questionnaire.Domain.Data;
 using Questionnaire.Domain.Model;
 
 namespace Questionnaire.Infrastructure.Repository;
