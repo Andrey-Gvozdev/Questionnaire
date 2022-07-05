@@ -48,6 +48,6 @@ public class QuestionsDefinitionController : ControllerBase
     {
         await questionDefinitionCRUDService.DeleteAsync(id);
 
-        return Ok();
+        return NoContent();
     }
 }

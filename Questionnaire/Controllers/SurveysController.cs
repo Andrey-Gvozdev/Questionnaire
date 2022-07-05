@@ -48,6 +48,6 @@ public class SurveysController : ControllerBase
     {
         await surveyCrudService.DeleteAsync(id);
 
-        return Ok();
+        return NoContent();
     }
 }
