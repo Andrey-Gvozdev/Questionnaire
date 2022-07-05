@@ -20,7 +20,6 @@ public class QuestionsDefinitionController : ControllerBase
         await questionDefinitionCRUDService.GetAllAsync();
 
     [HttpGet("{id}")]
-    [ActionName("GEtByIdAsync")]
     public Task<QuestionDefinition> GetByIdAsync(Guid id)
     {
         return questionDefinitionCRUDService.GetByIdAsync(id);

@@ -21,8 +21,7 @@ builder.Services.AddTransient<ISurveyRepository, SurveyRepository>();
 builder.Services.AddTransient<ISurveyCrudService, SurveyCrudService>();
 builder.Services.AddTransient<ISurveyValidationService, SurveyValidationService>();
 
-
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt => opt.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails(options =>

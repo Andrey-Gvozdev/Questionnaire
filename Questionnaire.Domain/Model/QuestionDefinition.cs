@@ -27,8 +27,7 @@ public class QuestionDefinition
         {
             if (validation.MaxLength == 0 &&
                 validation.MinLength == 0 &&
-                validation.IsRadioButtons == false &&
-                validation.IsPersent == false)
+                validation.IsRadioButtons == false)
             {
                 return QuestionDefinitionUIType.Number;
             }
@@ -41,8 +40,7 @@ public class QuestionDefinition
         {
             if (validation.MaxValue == 0 &&
                 validation.MaxValue == 0 &&
-                validation.IsRadioButtons == false &&
-                validation.IsPersent == false)
+                validation.IsRadioButtons == false)
             {
                 return QuestionDefinitionUIType.Text;
             }
@@ -56,25 +54,9 @@ public class QuestionDefinition
             if (validation.MaxValue == 0 &&
                 validation.MaxLength == 0 &&
                 validation.MaxLength == 0 &&
-                validation.MaxValue == 0 &&
-                validation.IsPersent == false)
+                validation.MaxValue == 0)
             {
                 return QuestionDefinitionUIType.RadioButton;
-            }
-            else
-            {
-                throw new ValidationException("Too many options selected");
-            }
-        }
-        if ((validation.IsPersent == true))
-        {
-            if (validation.MaxValue == 0 &&
-                validation.MaxLength == 0 &&
-                validation.MaxLength == 0 &&
-                validation.MaxValue == 0 &&
-                validation.IsRadioButtons == false)
-            {
-                return QuestionDefinitionUIType.Percent;
             }
             else
             {
