@@ -13,7 +13,9 @@ namespace QuestionsUnitTests;
 
 public class QuestionCrudMethodsTests
 {
+    // TODO: use access modifiers
     MongoDbRunner runner;
+    // TODO: these string can be constants
     string databaseName = "Test";
     string testCollectionName = "TestCollection";
     IMongoCollection<Question> testCollection;
@@ -29,21 +31,27 @@ public class QuestionCrudMethodsTests
         questionCrudService = new QuestionCrudService(questionRepository.Object);
     }
 
+    
     [Test]
+    // GetByIdAsync_ShouldGet
     public async Task QuestionCrudService_GetByIdAsync_Valid_Success()
     {
+        // TODO: use var
+        // TODO: use Guid.NewGuid()
         Question question = CreateQuestion(new Guid("1fa85f64-5717-4562-b3fc-2c963f66afa6"));
         await testCollection.InsertOneAsync(question);
 
         SetupQuestionRepositoryGetByIdMethod(question.Id);
         Question expectedQuestion = await questionCrudService.GetByIdAsync(question.Id);
 
+        // TODO: check if expectedQuestion is not null
         expectedQuestion.Id.Should().Be(question.Id);
 
         DisposeRunner();
     }
 
     [Test]
+    // GetByIdAsync_ShouldThrowIfQuestionNotExist
     public async Task QuestionCrudService_GetByIdAsync_InValid_Success()
     {
         Question question = CreateQuestion(new Guid("1fa85f64-5717-4562-b3fc-2c963f66afa6"));
@@ -57,6 +65,7 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
+    // CreateAsync_ShouldCreate
     public async Task QuestionCrudService_CreateAsync_Valid_Success()
     {
         Question question = CreateQuestion(new Guid("5fa85f64-5717-4562-b3fc-2c963f66afa6"));
@@ -75,6 +84,7 @@ public class QuestionCrudMethodsTests
     }
 
     [Test]
+    // CreateAsync_ShouldThrowIfQuestionInvalid or CreateAsync_ShouldThrowIfValidationFailed
     public async Task QuestionCrudService_CreateAsync_InValid_Success()
     {
         Question question = CreateQuestion(new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
@@ -173,6 +183,8 @@ public class QuestionCrudMethodsTests
         testCollection = database.GetCollection<Question>(testCollectionName);
     }
 
+    // TODO: use [TearDown] attribute to cleanup
+    // your test "environment" after test execution
     private void DisposeRunner()
     {
         runner.Dispose();
@@ -180,6 +192,7 @@ public class QuestionCrudMethodsTests
 
     private Question CreateQuestion(Guid id, string questionText = "defaultText")
     {
+        // TODO: make Fixture private field
         Fixture fixture = new Fixture();
         Question question = fixture.Build<Question>()
             .With(q => q.Id, id)
@@ -192,7 +205,10 @@ public class QuestionCrudMethodsTests
 
     private void SetupQuestionRepositoryCreateMethod(Question question)
     {
-        questionRepository.Setup(rep => rep.CreateAsync(question)).Returns(testCollection.InsertOneAsync(question));
+        // TODO: split code into multiple lines
+        questionRepository
+            .Setup(rep => rep.CreateAsync(question))
+            .Returns(testCollection.InsertOneAsync(question));
     }
 
     private void SetupQuestionRepositoryGetByIdMethod(Guid id)
