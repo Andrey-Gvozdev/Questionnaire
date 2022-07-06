@@ -15,5 +15,10 @@ public class QuestionDefinitionValidationService : IQuestionDefinitionValidation
         {
             throw new ValidationException("QuestionDefinition name can't be longer 50 charaсters");
         }
+        if (questionDefinition.Validation.MinValue > questionDefinition.Validation.MaxValue ||
+            questionDefinition.Validation.MinLength > questionDefinition.Validation.MaxLength)
+        {
+            throw new ValidationException("Min value can't be less than max");
+        }
     }
 }
