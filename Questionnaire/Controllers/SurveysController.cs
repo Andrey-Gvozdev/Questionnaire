@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;
 
@@ -9,22 +10,24 @@ namespace Questionnaire.Controllers;
 public class SurveysController : ControllerBase
 {
     private readonly ISurveyCrudService surveyCrudService;
+    private readonly IMapper mapper;
 
-    public SurveysController(ISurveyCrudService surveyCrudService)
+    public SurveysController(ISurveyCrudService surveyCrudService, IMapper mapper)
     {
         this.surveyCrudService = surveyCrudService;
+        this.mapper = mapper;
     }
 
     [HttpGet]
-    public Task<List<Survey>> GetAllAsync()
+    public async Task<List<SurveyDto>> GetAllAsync()
     {
-        return surveyCrudService.GetAllAsync();
+        return mapper.Map<List<SurveyDto>>(await surveyCrudService.GetAllAsync());
     }
 
     [HttpGet("{id}")]
-    public Task<Survey> GetByIdAsync(Guid id)
+    public async Task<SurveyDto> GetByIdAsync(Guid id)
     {
-        return surveyCrudService.GetByIdAsync(id);
+        return mapper.Map<SurveyDto>(await surveyCrudService.GetByIdAsync(id));
     }
 
     [HttpPost]
@@ -32,7 +35,7 @@ public class SurveysController : ControllerBase
     {
         await surveyCrudService.CreateAsync(newSurvey);
 
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = newSurvey.Id }, newSurvey);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = newSurvey.Id }, mapper.Map<SurveyDto>(newSurvey));
     }
 
     [HttpPut("{id}")]

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Questionnaire.Domain.Model;
 using Questionnaire.Domain.Services.CRUDServices;
 
@@ -9,22 +10,24 @@ namespace Questionnaire.Controllers;
 public class QuestionsDefinitionController : ControllerBase
 {
     private readonly IQuestionDefinitionCrudService questionDefinitionCRUDService;
+    private readonly IMapper mapper;
 
-    public QuestionsDefinitionController(IQuestionDefinitionCrudService questionDefinitionCRUDService)
+    public QuestionsDefinitionController(IQuestionDefinitionCrudService questionDefinitionCRUDService, IMapper mapper)
     {
         this.questionDefinitionCRUDService = questionDefinitionCRUDService;
+        this.mapper = mapper;
     }
 
     [HttpGet]
-    public Task<List<QuestionDefinition>> GetAllAsync()
+    public async Task<List<QuestionDefinitionDto>> GetAllAsync()
     {
-        return questionDefinitionCRUDService.GetAllAsync();
+        return mapper.Map<List<QuestionDefinitionDto>>(await questionDefinitionCRUDService.GetAllAsync());
     }
 
     [HttpGet("{id}")]
-    public Task<QuestionDefinition> GetByIdAsync(Guid id)
+    public async Task<QuestionDefinitionDto> GetByIdAsync(Guid id)
     {
-        return questionDefinitionCRUDService.GetByIdAsync(id);
+        return mapper.Map<QuestionDefinitionDto>(await questionDefinitionCRUDService.GetByIdAsync(id));
     }
 
     [HttpPost]
@@ -32,7 +35,7 @@ public class QuestionsDefinitionController : ControllerBase
     {
         await questionDefinitionCRUDService.CreateAsync(newQuestionDefinition);
 
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = newQuestionDefinition.Id }, newQuestionDefinition);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = newQuestionDefinition.Id }, mapper.Map<QuestionDefinitionDto>(newQuestionDefinition));
     }
 
     [HttpPut("{id}")]

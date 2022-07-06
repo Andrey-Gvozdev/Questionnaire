@@ -25,7 +25,12 @@ builder.Services.AddTransient<ISurveyValidationService, SurveyValidationService>
 builder.Services.AddControllers(opt => opt.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<QuestionMapProfile>());
+builder.Services.AddAutoMapper(cfg => 
+{ 
+    cfg.AddProfile<QuestionMapProfile>();
+    cfg.AddProfile<QuestionDefinitionMapProfile>();
+    cfg.AddProfile<SurveyMapProfile>();
+});
 builder.Services.AddProblemDetails(options =>
 {
     options.MapToStatusCode<NotFoundException>(StatusCodes.Status404NotFound);
