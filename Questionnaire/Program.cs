@@ -1,3 +1,4 @@
+using AutoMapper;
 using Hellang.Middleware.ProblemDetails;
 using Questionnaire.Domain.CustomExceptions;
 using Questionnaire.Domain.Data;
@@ -31,6 +32,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<QuestionDefinitionMapProfile>();
     cfg.AddProfile<SurveyMapProfile>();
 });
+builder.Services.Configure<IMapper>(cfg => cfg.ConfigurationProvider.AssertConfigurationIsValid());
 builder.Services.AddProblemDetails(options =>
 {
     options.MapToStatusCode<NotFoundException>(StatusCodes.Status404NotFound);
