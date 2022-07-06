@@ -5,6 +5,7 @@ using Questionnaire.Domain.Services.CRUDServices;
 using Questionnaire.Domain.Services.ValidationServices;
 using Questionnaire.Infrastructure;
 using Questionnaire.Infrastructure.Repository;
+using Questionnaire.Services;
 using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,7 @@ builder.Services.AddTransient<ISurveyValidationService, SurveyValidationService>
 builder.Services.AddControllers(opt => opt.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<QuestionMapProfile>());
 builder.Services.AddProblemDetails(options =>
 {
     options.MapToStatusCode<NotFoundException>(StatusCodes.Status404NotFound);
