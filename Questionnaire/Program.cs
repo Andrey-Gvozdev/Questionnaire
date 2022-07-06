@@ -6,7 +6,7 @@ using Questionnaire.Domain.Services.CRUDServices;
 using Questionnaire.Domain.Services.ValidationServices;
 using Questionnaire.Infrastructure;
 using Questionnaire.Infrastructure.Repository;
-using Questionnaire.Services;
+using Questionnaire.MapProfiles;
 using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);

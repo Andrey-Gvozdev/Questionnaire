@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Questionnaire.Domain.Model;
 
-namespace Questionnaire.Services;
+namespace Questionnaire.MapProfiles;
 
 public class QuestionMapProfile : Profile
 {
